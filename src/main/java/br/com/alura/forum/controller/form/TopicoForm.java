@@ -1,9 +1,18 @@
 package br.com.alura.forum.controller.form;
 
-public class TopicoForm {
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
+public class TopicoForm {
+	
+	@NotBlank @NotEmpty @Size(min = 5)
 	private String titulo;
+	
+	@NotBlank @Size(min = 10)
 	private String mensagem;
+	
+	@NotBlank
 	private String nomeCurso;
 	
 	public String getTitulo() {
