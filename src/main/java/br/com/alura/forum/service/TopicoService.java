@@ -1,10 +1,11 @@
 package br.com.alura.forum.service;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,12 +26,12 @@ public class TopicoService {
 	@Autowired
 	private TopicoRepository topicoRepository;
 	
-	public List<TopicoDto> listarTopicos(String nomeCurso) {
+	public Page<TopicoDto> listarTopicos(String nomeCurso, Pageable paginacao) {		
 		if (nomeCurso == null) {
-			return TopicoDto.converter( topicoRepository.findAll() );
+			return TopicoDto.converter( topicoRepository.findAll(paginacao) );
 		}
 		
-		return TopicoDto.converter( topicoRepository.findByCursoNome(nomeCurso) );
+		return TopicoDto.converter( topicoRepository.findByCursoNome(nomeCurso, paginacao) );
 	}
 
 	@Transactional

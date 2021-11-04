@@ -1,14 +1,16 @@
 package br.com.alura.forum.controller;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,8 +38,10 @@ public class TopicosController {
 	private TopicoService topicoService;
 	
 	@GetMapping
-	public ResponseEntity<List<TopicoDto>> listar(@RequestParam(name = "nomeCurso", required = false) String nomeCurso) {
-		return ResponseEntity.ok( topicoService.listarTopicos(nomeCurso) );
+	public ResponseEntity<Page<TopicoDto>> listar(@RequestParam(required = false) String nomeCurso, 
+			@PageableDefault(sort = "id", direction = Direction.DESC, page = 0, size = 10) Pageable paginacao) {
+		
+		return ResponseEntity.ok( topicoService.listarTopicos(nomeCurso, paginacao) );
 	}
 	
 	@PostMapping
