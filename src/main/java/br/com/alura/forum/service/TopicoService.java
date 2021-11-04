@@ -1,15 +1,20 @@
 package br.com.alura.forum.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.alura.forum.controller.form.TopicoForm;
+import br.com.alura.forum.dto.AtualizacaoTopicoForm;
 import br.com.alura.forum.dto.TopicoDto;
 import br.com.alura.forum.modelo.Curso;
 import br.com.alura.forum.modelo.Topico;
 import br.com.alura.forum.repository.TopicoRepository;
+import javassist.NotFoundException;
 
 @Service
 public class TopicoService {
@@ -20,10 +25,6 @@ public class TopicoService {
 	@Autowired
 	private TopicoRepository topicoRepository;
 	
-//	public List<TopicoDto> listarTopicos() {
-//		return TopicoDto.converter( topicoDao.findAll() );
-//	}
-	
 	public List<TopicoDto> listarTopicos(String nomeCurso) {
 		if (nomeCurso == null) {
 			return TopicoDto.converter( topicoRepository.findAll() );
@@ -32,11 +33,35 @@ public class TopicoService {
 		return TopicoDto.converter( topicoRepository.findByCursoNome(nomeCurso) );
 	}
 
+	@Transactional
 	public Topico salvar(TopicoForm topicoForm) {
 		Curso curso = cursoService.consultarCursoPorNome(topicoForm.getNomeCurso());
 		Topico topico = new Topico(topicoForm.getTitulo(), topicoForm.getMensagem(), curso);
 		
 		return topicoRepository.save(topico);
+	}
+
+	public Optional<Topico> consultarTopicoPorId(Long id) {
+		return topicoRepository.findById(id);
+	}
+
+	@Transactional
+	public Topico atualizar(AtualizacaoTopicoForm topicoForm) throws NotFoundException {
+		Optional<Topico> registro = topicoRepository.findById(topicoForm.getId());
+		
+		if (registro.isPresent()) {
+			Topico topico = registro.get();
+			topico.setTitulo( topicoForm.getTitulo() );
+			topico.setMensagem( topicoForm.getMensagem() );			
+			return topicoRepository.save(topico);
+		}
+		
+		throw new NotFoundException("Registro não encontrado!");
+	}
+
+	@Transactional
+	public void deletar(Long id) throws EmptyResultDataAccessException {
+		topicoRepository.deleteById(id);			
 	}
 	
 }
